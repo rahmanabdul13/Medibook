@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hospitals | MediBook</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2>🏥 MediBook</h2>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/hospitals">Hospitals</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/book" class="nav-btn">Book Appointment</a>
+        </div>
+    </nav>
+
+    <section class="features hospitals-section">
+        <h1>Find Your Hospital</h1>
+
+        <p class="section-description">
+            Explore hospitals and choose the right place for your appointment.
+        </p>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <span>🏥</span>
+                <h3>City Care Hospital</h3>
+                <p>Specializations: General Medicine, Cardiology</p>
+                <p>Location: Mysuru</p>
+                <br>
+                <a href="/doctors?hospital=City%20Care%20Hospital"class="primary-btn">View Doctors</a>
+            </div>
+
+            <div class="feature-card">
+                <span>🏥</span>
+                <h3>Green Life Hospital</h3>
+                <p>Specializations: Orthopedics, Pediatrics</p>
+                <p>Location: Mysuru</p>
+                <br>
+                <a href="/doctors?hospital=Green%20Life%20Hospital"
+   class="primary-btn">View Doctors</a>
+            </div>
+
+            <div class="feature-card">
+                <span>🏥</span>
+                <h3>Sunrise Medical Centre</h3>
+                <p>Specializations: Dermatology, General Medicine</p>
+                <p>Location: Mysuru</p>
+                <br>
+                <a href="/doctors?hospital=Sunrise%20Medical%20Centre"
+   class="primary-btn">View Doctors</a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <h3>🏥 MediBook</h3>
+        <p>Making healthcare appointments simpler.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Find Doctors | MediBook</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <h2>🏥 MediBook</h2>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/hospitals">Hospitals</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/book" class="nav-btn">Book Appointment</a>
+        </div>
+    </nav>
+
+    <!-- Doctors Section -->
+    <section class="features doctors-section">
+
+        <h1>
+    {% if selected_hospital %}
+        Doctors at {{ selected_hospital }}
+    {% else %}
+        Find Your Doctor
+    {% endif %}
+</h1>
+
+        <p class="section-description">
+            Explore our sample doctor directory and find a specialist.
+        </p>
+
+        <!-- Search -->
+        <div class="doctor-search">
+            <input
+                type="text"
+                id="doctorSearch"
+                placeholder="Search by doctor, specialization or hospital..."
+                aria-label="Search doctors"
+            >
+        </div>
+
+        <!-- Doctor Cards -->
+        <div class="feature-grid doctor-grid" id="doctorGrid">
+
+            {% for doctor in doctors %}
+
+            <div class="feature-card doctor-card">
+
+                <div class="doctor-icon">
+                    {{ doctor.icon }}
+                </div>
+
+                <h3>{{ doctor.name }}</h3>
+
+                <p class="doctor-specialization">
+                    {{ doctor.specialization }}
+                </p>
+
+                <p>
+                    🏥 {{ doctor.hospital }}
+                </p>
+
+                <p>
+                    💼 {{ doctor.experience }} experience
+                </p>
+
+                <a href="/book" class="primary-btn">
+                    Book Appointment
+                </a>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <p id="noDoctors" class="no-doctors" hidden>
+            No doctors found. Try another search.
+        </p>
+
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <h3>🏥 MediBook</h3>
+        <p>Making healthcare appointments simpler.</p>
+    </footer>
+
+    <!-- Search functionality -->
+    <script>
+        const searchInput = document.getElementById("doctorSearch");
+        const doctorCards = document.querySelectorAll(".doctor-card");
+        const noDoctors = document.getElementById("noDoctors");
+
+        searchInput.addEventListener("input", function () {
+            const query = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            doctorCards.forEach(function (card) {
+                const matches = card.textContent
+                    .toLowerCase()
+                    .includes(query);
+
+                card.style.display = matches ? "" : "none";
+
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            noDoctors.hidden = visibleCount !== 0;
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MediBook | Healthcare Appointments</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2>🏥 MediBook</h2>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/hospitals">Hospitals</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/book" class="nav-btn">Book Appointment</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <p class="tagline">YOUR HEALTH, OUR PRIORITY</p>
+
+            <h1>Healthcare Made<br>
+                <span>Simple & Accessible</span>
+            </h1>
+
+            <p class="description">
+                Discover hospitals, find the right doctors,
+                and book your appointments online with MediBook.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="/hospitals" class="primary-btn">
+                    Explore Hospitals
+                </a>
+
+                <a href="/doctors" class="secondary-btn">
+                    Find a Doctor
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-card">
+            <div class="medical-icon">🩺</div>
+            <h2>Your Health Journey Starts Here</h2>
+            <p>Find care. Book appointments. Stay informed.</p>
+
+            <div class="card-stat">
+                <span>🏥</span>
+                <div>
+                    <strong>Multiple Hospitals</strong>
+                    <p>One convenient platform</p>
+                </div>
+            </div>
+
+            <div class="card-stat">
+                <span>👨‍⚕️</span>
+                <div>
+                    <strong>Find Your Doctor</strong>
+                    <p>Search by specialization</p>
+                </div>
+            </div>
+
+            <div class="card-stat">
+                <span>📅</span>
+                <div>
+                    <strong>Easy Booking</strong>
+                    <p>Choose a convenient time</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features hospitals-section">
+        <h2>Everything You Need in One Place</h2>
+
+        <p class="section-description">
+            Making hospital appointments easier for everyone.
+        </p>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <span>🏥</span>
+                <h3>Multiple Hospitals</h3>
+                <p>Explore hospitals from one platform.</p>
+            </div>
+
+            <div class="feature-card">
+                <span>👨‍⚕️</span>
+                <h3>Doctor Search</h3>
+                <p>Find doctors based on specialization.</p>
+            </div>
+
+            <div class="feature-card">
+                <span>📅</span>
+                <h3>Online Booking</h3>
+                <p>Book appointments in a few simple steps.</p>
+            </div>
+
+            <div class="feature-card">
+                <span>🔔</span>
+                <h3>Emergency Notifications</h3>
+                <p>Notify authorized hospital staff about submitted emergency requests.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <h3>🏥 MediBook</h3>
+        <p>Making healthcare appointments simpler.</p>
+        <p class="footer-note">
+            For life-threatening emergencies, seek immediate emergency assistance.
+        </p>
+    </footer>
+
+</body>
+</html>
