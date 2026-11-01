@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>My Appointments | MediBook</title>
+
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
+    <!-- NAVBAR -->
     <nav class="navbar">
+
         <h2>🏥 MediBook</h2>
 
         <div class="nav-links">
@@ -19,9 +24,13 @@
             <a href="/doctors">Doctors</a>
             <a href="/book">Book Appointment</a>
         </div>
+
     </nav>
 
+
+    <!-- APPOINTMENTS SECTION -->
     <section class="booking-section">
+
         <div class="booking-container appointments-container">
 
             <h1>My Appointments</h1>
@@ -30,6 +39,8 @@
                 Enter your registered email to view your appointments.
             </p>
 
+
+            <!-- SEARCH APPOINTMENTS -->
             <form action="/my-appointments" method="POST">
 
                 <label>Email Address</label>
@@ -38,6 +49,7 @@
                     type="email"
                     name="email"
                     placeholder="Enter your email"
+                    value="{{ email }}"
                     required
                 >
 
@@ -47,6 +59,8 @@
 
             </form>
 
+
+            <!-- DISPLAY APPOINTMENTS -->
             {% if searched %}
 
                 <h2>Your Bookings</h2>
@@ -59,30 +73,93 @@
 
                             <h3>{{ appointment.hospital }}</h3>
 
-                            <p><strong>Patient:</strong>
-                                {{ appointment.patient_name }}</p>
+                            <p>
+                                <strong>Patient:</strong>
+                                {{ appointment.patient_name }}
+                            </p>
 
-                            <p><strong>Doctor:</strong>
-                                {{ appointment.doctor }}</p>
+                            <p>
+                                <strong>Doctor:</strong>
+                                {{ appointment.doctor }}
+                            </p>
 
-                            <p><strong>Date:</strong>
-                                {{ appointment.appointment_date }}</p>
+                            <p>
+                                <strong>Date:</strong>
+                                {{ appointment.appointment_date }}
+                            </p>
 
-                            <p><strong>Time:</strong>
-                                {{ appointment.appointment_time }}</p>
+                            <p>
+                                <strong>Time:</strong>
+                                {{ appointment.appointment_time }}
+                            </p>
 
-                            <p><strong>Status:</strong>
-                                {{ appointment.status }}</p>
+                            <p>
+                                <strong>Appointment Type:</strong>
+                                {{ appointment.appointment_type }}
+                            </p>
+
+                            <p>
+                                <strong>Priority:</strong>
+                                {{ appointment.priority }}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+
                                 {% if appointment.status == "Pending" %}
-<form action="/cancel-appointment/{{ appointment.id }}" method="POST"
-      onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
 
-    <button type="submit" class="cancel-btn">
-        Cancel Appointment
-    </button>
+                                    <span class="normal-priority">
+                                        {{ appointment.status }}
+                                    </span>
 
-</form>
-{% endif %}
+                                {% elif appointment.status == "Confirmed" %}
+
+                                    <span class="slot-available">
+                                        {{ appointment.status }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="slot-booked">
+                                        {{ appointment.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </p>
+
+
+                            <!-- CANCEL APPOINTMENT -->
+                            {% if appointment.status == "Pending" %}
+
+                                <form
+                                    action="{{ url_for(
+                                        'cancel_appointment',
+                                        appointment_id=appointment.id
+                                    ) }}"
+                                    method="POST"
+                                    onsubmit="return confirm(
+                                        'Are you sure you want to cancel this appointment?'
+                                    );"
+                                >
+
+                                    <!-- REGISTERED EMAIL -->
+                                    <input
+                                        type="hidden"
+                                        name="email"
+                                        value="{{ appointment.email }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="cancel-btn"
+                                    >
+                                        Cancel Appointment
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
 
                         </div>
 
@@ -97,12 +174,19 @@
             {% endif %}
 
         </div>
+
     </section>
 
+
+    <!-- FOOTER -->
     <footer>
+
         <h3>🏥 MediBook</h3>
+
         <p>Making healthcare appointments simpler.</p>
+
     </footer>
 
 </body>
+
 </html>
