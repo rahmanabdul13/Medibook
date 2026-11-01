@@ -1,7 +1,18 @@
 from flask import Flask, render_template, request
-from flask import Flask, render_template
+import os
+from dotenv import load_dotenv
+from supabase import create_client
 
 app = Flask(__name__)
+
+# Load environment variables
+load_dotenv()
+
+# Supabase connection
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 @app.route("/")
@@ -77,9 +88,76 @@ def doctors():
     )
 
 
-@app.route("/book")
+@app.route("/book", methods=["GET", "POST"])
 def booking():
-    return render_template("booking.html")
+
+    hospitals = [
+        "City Care Hospital",
+        "Green Life Hospital",
+        "Sunrise Medical Centre"
+    ]
+
+    doctors = {
+        "City Care Hospital": [
+            "Dr. Rahul Sharma",
+            "Dr. Priya Rao"
+        ],
+        "Green Life Hospital": [
+            "Dr. Ananya Kumar",
+            "Dr. Vikram Reddy"
+        ],
+        "Sunrise Medical Centre": [
+            "Dr. Sneha Patel",
+            "Dr. Arjun Mehta"
+        ]
+    }
+
+    if request.method == "POST":
+
+        patient_name = request.form.get("patient_name", "").strip()
+        email = request.form.get("email", "").strip()
+        phone = request.form.get("phone", "").strip()
+        hospital = request.form.get("hospital", "")
+        doctor = request.form.get("doctor", "")
+        appointment_date = request.form.get("appointment_date", "")
+        appointment_time = request.form.get("appointment_time", "")
+
+        if (
+            not patient_name or
+            not email or
+            not phone or
+            hospital not in doctors or
+            doctor not in doctors.get(hospital, []) or
+            not appointment_date or
+            not appointment_time
+        ):
+            return "Invalid appointment details", 400
+
+        return render_template(
+            "booking_success.html",
+            patient_name=patient_name,
+            hospital=hospital,
+            doctor=doctor,
+            appointment_date=appointment_date,
+            appointment_time=appointment_time
+        )
+
+    hospital = request.args.get("hospital", "")
+    doctor = request.args.get("doctor", "")
+
+    if hospital not in doctors:
+        hospital = ""
+
+    if doctor not in doctors.get(hospital, []):
+        doctor = ""
+
+    return render_template(
+        "booking.html",
+        hospitals=hospitals,
+        doctors=doctors,
+        selected_hospital=hospital,
+        selected_doctor=doctor
+    )
 
 
 if __name__ == "__main__":

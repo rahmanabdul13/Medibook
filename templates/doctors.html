@@ -74,9 +74,10 @@
                     💼 {{ doctor.experience }} experience
                 </p>
 
-                <a href="/book" class="primary-btn">
-                    Book Appointment
-                </a>
+                <a href="{{ url_for('booking', hospital=doctor.hospital, doctor=doctor.name) }}"
+   class="primary-btn">
+    Book Appointment
+</a>
 
             </div>
 

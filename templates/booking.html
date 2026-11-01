@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Book Appointment | MediBook</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2>🏥 MediBook</h2>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/hospitals">Hospitals</a>
+            <a href="/doctors">Doctors</a>
+        </div>
+    </nav>
+
+    <section class="booking-section">
+
+        <div class="booking-container">
+
+            <h1>Book Your Appointment</h1>
+
+            <p class="booking-description">
+                Fill in your details to schedule an appointment.
+            </p>
+
+            <form action="/book" method="POST">
+
+                <label>Patient Name</label>
+                <input type="text"
+                       name="patient_name"
+                       placeholder="Enter your full name"
+                       required>
+
+                <label>Email Address</label>
+                <input type="email"
+                       name="email"
+                       placeholder="Enter your email"
+                       required>
+
+                <label>Phone Number</label>
+                <input type="tel"
+                       name="phone"
+                       placeholder="Enter your phone number"
+                       pattern="[0-9]{10}"
+                       maxlength="10"
+                       required>
+
+                <label>Select Hospital</label>
+                <select name="hospital" id="hospital" required>
+                    <option value="">Choose a hospital</option>
+
+                    {% for h in hospitals %}
+                    <option value="{{ h }}"
+                        {% if h == selected_hospital %}selected{% endif %}>
+                        {{ h }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <label>Select Doctor</label>
+                <select name="doctor" id="doctor" required>
+                    <option value="">Choose a doctor</option>
+
+                    {% if selected_hospital %}
+                        {% for d in doctors[selected_hospital] %}
+                        <option value="{{ d }}"
+                            {% if d == selected_doctor %}selected{% endif %}>
+                            {{ d }}
+                        </option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+
+                <label>Appointment Date</label>
+                <input type="date"
+                       name="appointment_date"
+                       id="appointment_date"
+                       required>
+
+                <label>Appointment Time</label>
+                <select name="appointment_time" required>
+                    <option value="">Choose a time</option>
+                    <option value="09:00">09:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="14:00">02:00 PM</option>
+                    <option value="15:00">03:00 PM</option>
+                    <option value="16:00">04:00 PM</option>
+                </select>
+
+                <button type="submit" class="booking-btn">
+                    Confirm Appointment
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <footer>
+        <h3>🏥 MediBook</h3>
+        <p>Making healthcare appointments simpler.</p>
+    </footer>
+
+    <script>
+        const hospitalSelect = document.getElementById("hospital");
+        const doctorSelect = document.getElementById("doctor");
+
+        const doctors = {{ doctors | tojson }};
+
+        hospitalSelect.addEventListener("change", function () {
+
+            const selected = this.value;
+
+            doctorSelect.innerHTML =
+                '<option value="">Choose a doctor</option>';
+
+            if (selected && doctors[selected]) {
+                doctors[selected].forEach(function (doctor) {
+
+                    const option = document.createElement("option");
+                    option.value = doctor;
+                    option.textContent = doctor;
+
+                    doctorSelect.appendChild(option);
+                });
+            }
+        });
+
+        document.getElementById("appointment_date").min =
+            new Date().toISOString().split("T")[0];
+    </script>
+
+</body>
+</html>
