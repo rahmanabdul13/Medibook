@@ -380,22 +380,34 @@ def my_appointments():
 @app.route("/cancel-appointment/<int:appointment_id>", methods=["POST"])
 def cancel_appointment(appointment_id):
 
+    email = request.form.get("email", "").strip()
+
+    if not email:
+        return "Registered email is required.", 400
+
     try:
+        response = (
+            supabase.table("appointments")
+            .update({"status": "Cancelled"})
+            .eq("id", appointment_id)
+            .eq("email", email)
+            .eq("status", "Pending")
+            .select()
+            .execute()
+        )
 
-        supabase.table("appointments").update({
-            "status": "Cancelled"
-        }).eq("id", appointment_id).eq("status", "Pending").execute()
+        if not response.data:
+            return """
+                <script>
+                    alert('No matching Pending appointment found. Check the ID, email and status.');
+                    window.location.href = '/my-appointments';
+                </script>
+            """, 404
 
-        return """
-            <script>
-                alert('Appointment cancelled successfully!');
-                window.location.href = '/my-appointments';
-            </script>
-        """
+        return redirect(url_for("my_appointments"))
 
     except Exception as e:
-
-        print("Cancellation failed:", e)
+        print("CANCELLATION ERROR:", repr(e))
         return "Unable to cancel appointment.", 500
 
 
@@ -574,4 +586,4 @@ def confirm_appointment(appointment_id):
 
 # RUN APPLICATION
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
