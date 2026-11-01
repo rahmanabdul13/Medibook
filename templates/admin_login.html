@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | MediBook</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2>🏥 MediBook</h2>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/hospitals">Hospitals</a>
+            <a href="/doctors">Doctors</a>
+        </div>
+    </nav>
+
+    <section class="admin-login-section">
+
+        <div class="admin-login-container">
+
+            <div class="admin-login-icon">🔐</div>
+
+            <h1>Hospital Admin Login</h1>
+
+            <p>Sign in to manage your hospital appointments.</p>
+
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+
+            <form action="/admin-login" method="POST">
+
+                <label>Email Address</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter admin email"
+                    required
+                >
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <button type="submit" class="booking-btn">
+                    Login to Dashboard
+                </button>
+
+            </form>
+
+            <a href="/" class="admin-back-link">← Back to Home</a>
+
+        </div>
+
+    </section>
+
+    <footer>
+        <h3>🏥 MediBook</h3>
+        <p>Making healthcare appointments simpler.</p>
+    </footer>
+
+</body>
+</html>
+

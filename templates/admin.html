@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hospital Admin | MediBook</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin: 25px 0;
+    }
+
+    .admin-stat-card {
+        padding: 22px;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+        border-left: 5px solid #0891b2;
+    }
+
+    .admin-stat-card h3 {
+        font-size: 15px;
+        color: #64748b;
+        margin-bottom: 12px;
+    }
+
+    .admin-stat-card h2 {
+        font-size: 30px;
+        color: #12345a;
+    }
+
+    .analytics-section {
+        margin: 35px 0;
+    }
+
+    .analytics-section h2 {
+        margin-bottom: 20px;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+
+    .chart-card {
+        background: white;
+        padding: 22px;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+        min-width: 0;
+    }
+
+    .chart-card h3 {
+        margin-bottom: 20px;
+        color: #12345a;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 280px;
+    }
+
+    .admin-stat-card.today {
+        border-left-color: #0d9488;
+    }
+
+    .admin-stat-card.emergency {
+        border-left-color: #dc2626;
+    }
+
+    .admin-stat-card.regular {
+        border-left-color: #2563eb;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<!-- NAVBAR -->
+<nav class="navbar">
+
+    <h2>🏥 MediBook Admin</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/hospitals">Hospitals</a>
+        <a href="/doctors">Doctors</a>
+        <a href="/admin-logout" class="admin-logout-btn">Logout</a>
+    </div>
+
+</nav>
+
+
+<!-- ADMIN DASHBOARD -->
+<section class="admin-section">
+
+    <div class="admin-container">
+
+        <h1>{{ selected_hospital }} Dashboard</h1>
+
+        <p class="booking-description">
+            Manage appointments and patient bookings for
+            {{ selected_hospital }}.
+        </p>
+
+
+        <!-- HOSPITAL INFORMATION -->
+        <div class="admin-hospital-info">
+
+            <h3>🏥 {{ selected_hospital }}</h3>
+
+            <p>Hospital Administrator</p>
+
+        </div>
+
+
+        <!-- DASHBOARD STATISTICS -->
+        <div class="admin-stats">
+
+            <div class="admin-stat-card">
+                <h3>Total Appointments</h3>
+                <h2>{{ total }}</h2>
+            </div>
+
+            <div class="admin-stat-card today">
+                <h3>Today's Appointments</h3>
+                <h2 id="today-count">0</h2>
+            </div>
+
+            <div class="admin-stat-card">
+                <h3>Pending</h3>
+                <h2>{{ pending }}</h2>
+            </div>
+
+            <div class="admin-stat-card">
+                <h3>Confirmed</h3>
+                <h2>{{ confirmed }}</h2>
+            </div>
+
+            <div class="admin-stat-card">
+                <h3>Cancelled</h3>
+                <h2>{{ cancelled }}</h2>
+            </div>
+
+            <div class="admin-stat-card emergency">
+                <h3>Emergency Appointments</h3>
+                <h2 id="emergency-count">0</h2>
+            </div>
+
+            <div class="admin-stat-card regular">
+                <h3>Regular Appointments</h3>
+                <h2 id="regular-count">0</h2>
+            </div>
+
+        </div>
+
+
+        <!-- ANALYTICS -->
+        <div class="analytics-section">
+
+            <h2>📊 Appointment Analytics</h2>
+
+            <div class="analytics-grid">
+
+                <!-- DAILY APPOINTMENT CHART -->
+                <div class="chart-card">
+
+                    <h3>Daily Appointments (Last 7 Days)</h3>
+
+                    <div class="chart-container">
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <!-- APPOINTMENT TYPE CHART -->
+                <div class="chart-card">
+
+                    <h3>Appointment Type Distribution</h3>
+
+                    <div class="chart-container">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- APPOINTMENT MANAGEMENT -->
+        <h2 class="admin-heading">
+            Appointment Management
+        </h2>
+
+
+        <div class="admin-table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Patient</th>
+                        <th>Email</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="appointment-table">
+
+                    {% for appointment in appointments %}
+
+                    <tr
+                        class="{% if appointment.appointment_type == 'Emergency' %}emergency-row{% endif %}"
+                        data-date="{{ appointment.appointment_date }}"
+                        data-type="{{ appointment.appointment_type }}"
+                        data-status="{{ appointment.status }}">
+
+                        <td>{{ appointment.patient_name }}</td>
+
+                        <td>{{ appointment.email }}</td>
+
+                        <td>{{ appointment.doctor }}</td>
+
+                        <td>{{ appointment.appointment_date }}</td>
+
+                        <td>{{ appointment.appointment_time }}</td>
+
+
+                        <!-- APPOINTMENT TYPE -->
+                        <td>
+
+                            {% if appointment.appointment_type == "Emergency" %}
+
+                            <span class="emergency-badge">
+                                🚨 Emergency
+                            </span>
+
+                            {% else %}
+
+                            <span class="regular-badge">
+                                Regular
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PRIORITY -->
+                        <td>
+
+                            {% if appointment.priority == "High" %}
+
+                            <span class="high-priority">
+                                🔴 High
+                            </span>
+
+                            {% else %}
+
+                            <span class="normal-priority">
+                                Normal
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td>{{ appointment.status }}</td>
+
+
+                        <!-- ACTION -->
+                        <td>
+
+                            {% if appointment.status == "Pending" %}
+
+                            <form
+                                action="{{ url_for('confirm_appointment', appointment_id=appointment.id) }}"
+                                method="POST">
+
+                                <button type="submit"
+                                        class="admin-approve-btn">
+                                    Confirm
+                                </button>
+
+                            </form>
+
+                            {% else %}
+
+                            <span>-</span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="9">
+                            No appointments available for this hospital.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+
+    <h3>🏥 MediBook</h3>
+
+    <p>Making healthcare appointments simpler.</p>
+
+</footer>
+
+
+<!-- ANALYTICS JAVASCRIPT -->
+<script>
+
+    // GET APPOINTMENT DATA FROM TABLE
+    const rows = document.querySelectorAll(
+        "#appointment-table tr[data-date]"
+    );
+
+    const appointments = Array.from(rows).map(row => ({
+        date: row.dataset.date,
+        type: row.dataset.type,
+        status: row.dataset.status
+    }));
+
+
+    // TODAY'S DATE
+    const today = new Date();
+
+    const todayString =
+        today.getFullYear() + "-" +
+        String(today.getMonth() + 1).padStart(2, "0") + "-" +
+        String(today.getDate()).padStart(2, "0");
+
+
+    // CALCULATE STATISTICS
+    const todayCount = appointments.filter(
+        appointment => appointment.date === todayString
+    ).length;
+
+    const emergencyCount = appointments.filter(
+        appointment => appointment.type === "Emergency"
+    ).length;
+
+    const regularCount = appointments.filter(
+        appointment => appointment.type === "Regular"
+    ).length;
+
+
+    // DISPLAY STATISTICS
+    document.getElementById("today-count").textContent =
+        todayCount;
+
+    document.getElementById("emergency-count").textContent =
+        emergencyCount;
+
+    document.getElementById("regular-count").textContent =
+        regularCount;
+
+
+    // DAILY APPOINTMENT DATA - LAST 7 DAYS
+    const dailyLabels = [];
+
+    const dailyCounts = [];
+
+    for (let i = 6; i >= 0; i--) {
+
+        const date = new Date();
+
+        date.setDate(date.getDate() - i);
+
+        const dateString =
+            date.getFullYear() + "-" +
+            String(date.getMonth() + 1).padStart(2, "0") + "-" +
+            String(date.getDate()).padStart(2, "0");
+
+        dailyLabels.push(
+            date.toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short"
+            })
+        );
+
+        const count = appointments.filter(
+            appointment => appointment.date === dateString
+        ).length;
+
+        dailyCounts.push(count);
+
+    }
+
+
+    // DAILY APPOINTMENT CHART
+    new Chart(
+        document.getElementById("dailyChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: dailyLabels,
+
+                datasets: [{
+                    label: "Appointments",
+
+                    data: dailyCounts,
+
+                    backgroundColor: "#0891b2",
+
+                    borderRadius: 6
+                }]
+            },
+
+            options: {
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    // APPOINTMENT TYPE CHART
+    new Chart(
+        document.getElementById("typeChart"),
+        {
+            type: "doughnut",
+
+            data: {
+                labels: [
+                    "Regular",
+                    "Emergency"
+                ],
+
+                datasets: [{
+                    data: [
+                        regularCount,
+                        emergencyCount
+                    ],
+
+                    backgroundColor: [
+                        "#2563eb",
+                        "#dc2626"
+                    ],
+
+                    borderWidth: 2
+                }]
+            },
+
+            options: {
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    }
+                }
+            }
+        }
+    );
+
+</script>
+
+
+</body>
+</html>

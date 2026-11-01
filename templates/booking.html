@@ -1,17 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Book Appointment | MediBook</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .availability-section {
+            margin: 15px 0 20px;
+        }
+
+        .availability-section h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #12345a;
+        }
+
+        .availability-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .availability-table th,
+        .availability-table td {
+            padding: 11px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .availability-table th {
+            background: #f1f5f9;
+        }
+
+        .slot-booked {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .slot-available {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .availability-message {
+            font-size: 13px;
+            margin-top: 8px;
+            color: #64748b;
+        }
+
+        #appointment_time:disabled {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 
 <body>
 
+    <!-- NAVBAR -->
     <nav class="navbar">
         <h2>🏥 MediBook</h2>
 
@@ -22,6 +73,7 @@
         </div>
     </nav>
 
+    <!-- BOOKING SECTION -->
     <section class="booking-section">
 
         <div class="booking-container">
@@ -32,21 +84,34 @@
                 Fill in your details to schedule an appointment.
             </p>
 
+            <!-- ERROR MESSAGE -->
+            {% if error %}
+            <div class="error-message">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
+
             <form action="/book" method="POST">
 
+                <!-- PATIENT NAME -->
                 <label>Patient Name</label>
+
                 <input type="text"
                        name="patient_name"
                        placeholder="Enter your full name"
                        required>
 
+                <!-- EMAIL -->
                 <label>Email Address</label>
+
                 <input type="email"
                        name="email"
                        placeholder="Enter your email"
                        required>
 
+                <!-- PHONE -->
                 <label>Phone Number</label>
+
                 <input type="tel"
                        name="phone"
                        placeholder="Enter your phone number"
@@ -54,8 +119,11 @@
                        maxlength="10"
                        required>
 
+                <!-- HOSPITAL -->
                 <label>Select Hospital</label>
+
                 <select name="hospital" id="hospital" required>
+
                     <option value="">Choose a hospital</option>
 
                     {% for h in hospitals %}
@@ -64,10 +132,14 @@
                         {{ h }}
                     </option>
                     {% endfor %}
+
                 </select>
 
+                <!-- DOCTOR -->
                 <label>Select Doctor</label>
+
                 <select name="doctor" id="doctor" required>
+
                     <option value="">Choose a doctor</option>
 
                     {% if selected_hospital %}
@@ -78,26 +150,93 @@
                         </option>
                         {% endfor %}
                     {% endif %}
+
                 </select>
 
+                <!-- APPOINTMENT TYPE -->
+                <label>Appointment Type</label>
+
+                <select name="appointment_type"
+                        id="appointment_type"
+                        required>
+
+                    <option value="Regular">
+                        Regular Appointment
+                    </option>
+
+                    <option value="Emergency">
+                        🚨 Emergency Appointment
+                    </option>
+
+                </select>
+
+                <!-- EMERGENCY WARNING -->
+                <div id="emergency-warning"
+                     class="emergency-warning"
+                     style="display: none;">
+
+                    ⚠️ <strong>Emergency Booking:</strong>
+
+                    This option helps the hospital prioritize your
+                    appointment request. It does not provide emergency
+                    medical care. For life-threatening conditions,
+                    contact emergency services immediately.
+
+                </div>
+
+                <!-- APPOINTMENT DATE -->
                 <label>Appointment Date</label>
+
                 <input type="date"
                        name="appointment_date"
                        id="appointment_date"
                        required>
 
+                <!-- AVAILABILITY TABLE -->
+                <div class="availability-section">
+
+                    <h3>📅 Appointment Slot Availability</h3>
+
+                    <table class="availability-table">
+
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Availability</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="availability-body">
+
+                            <tr>
+                                <td colspan="2">
+                                    Select a hospital, doctor and date
+                                    to check availability.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                    <p id="availability-message"
+                       class="availability-message"></p>
+
+                </div>
+
+                <!-- APPOINTMENT TIME -->
                 <label>Appointment Time</label>
-                <select name="appointment_time" required>
+
+                <select name="appointment_time"
+                        id="appointment_time"
+                        required
+                        disabled>
+
                     <option value="">Choose a time</option>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="12:00">12:00 PM</option>
-                    <option value="14:00">02:00 PM</option>
-                    <option value="15:00">03:00 PM</option>
-                    <option value="16:00">04:00 PM</option>
+
                 </select>
 
+                <!-- SUBMIT BUTTON -->
                 <button type="submit" class="booking-btn">
                     Confirm Appointment
                 </button>
@@ -108,17 +247,91 @@
 
     </section>
 
+    <!-- FOOTER -->
     <footer>
         <h3>🏥 MediBook</h3>
         <p>Making healthcare appointments simpler.</p>
     </footer>
 
+
+    <!-- JAVASCRIPT -->
     <script>
-        const hospitalSelect = document.getElementById("hospital");
-        const doctorSelect = document.getElementById("doctor");
+
+        const hospitalSelect =
+            document.getElementById("hospital");
+
+        const doctorSelect =
+            document.getElementById("doctor");
+
+        const appointmentType =
+            document.getElementById("appointment_type");
+
+        const emergencyWarning =
+            document.getElementById("emergency-warning");
+
+        const appointmentDate =
+            document.getElementById("appointment_date");
+
+        const appointmentTime =
+            document.getElementById("appointment_time");
+
+        const availabilityBody =
+            document.getElementById("availability-body");
+
+        const availabilityMessage =
+            document.getElementById("availability-message");
 
         const doctors = {{ doctors | tojson }};
 
+
+        // AVAILABLE TIME SLOTS
+        const timeSlots = [
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "14:00",
+            "15:00",
+            "16:00"
+        ];
+
+
+        // FORMAT TIME
+        function formatTime(time) {
+
+            const [hour, minute] = time.split(":");
+
+            let h = parseInt(hour);
+
+            const period = h >= 12 ? "PM" : "AM";
+
+            h = h % 12 || 12;
+
+            return `${String(h).padStart(2, "0")}:${minute} ${period}`;
+
+        }
+
+
+        // RESET AVAILABILITY
+        function resetAvailability(message) {
+
+            availabilityBody.innerHTML = `
+                <tr>
+                    <td colspan="2">${message}</td>
+                </tr>
+            `;
+
+            availabilityMessage.textContent = "";
+
+            appointmentTime.innerHTML =
+                '<option value="">Choose a time</option>';
+
+            appointmentTime.disabled = true;
+
+        }
+
+
+        // UPDATE DOCTORS WHEN HOSPITAL CHANGES
         hospitalSelect.addEventListener("change", function () {
 
             const selected = this.value;
@@ -127,19 +340,195 @@
                 '<option value="">Choose a doctor</option>';
 
             if (selected && doctors[selected]) {
+
                 doctors[selected].forEach(function (doctor) {
 
                     const option = document.createElement("option");
+
                     option.value = doctor;
                     option.textContent = doctor;
 
                     doctorSelect.appendChild(option);
+
                 });
+
             }
+
+            resetAvailability(
+                "Select a doctor and date to check availability."
+            );
+
         });
 
-        document.getElementById("appointment_date").min =
-            new Date().toISOString().split("T")[0];
+
+        // CHECK AVAILABILITY
+        async function loadAvailability() {
+
+            const hospital = hospitalSelect.value;
+            const doctor = doctorSelect.value;
+            const date = appointmentDate.value;
+
+            resetAvailability("Checking availability...");
+
+            if (!hospital || !doctor || !date) {
+
+                resetAvailability(
+                    "Select a hospital, doctor and date to check availability."
+                );
+
+                return;
+
+            }
+
+            try {
+
+                const params = new URLSearchParams({
+                    hospital: hospital,
+                    doctor: doctor,
+                    date: date
+                });
+
+                const response = await fetch(
+                    `/available-slots?${params.toString()}`
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.error || "Unable to check availability."
+                    );
+
+                }
+
+                const bookedSlots = data.booked_slots || [];
+
+                availabilityBody.innerHTML = "";
+
+                appointmentTime.innerHTML =
+                    '<option value="">Choose a time</option>';
+
+                let availableCount = 0;
+
+
+                // DISPLAY EACH TIME SLOT
+                timeSlots.forEach(function (time) {
+
+                    const isBooked = bookedSlots.includes(time);
+
+                    const row = document.createElement("tr");
+
+                    const timeCell = document.createElement("td");
+
+                    const statusCell = document.createElement("td");
+
+                    timeCell.textContent = formatTime(time);
+
+
+                    if (isBooked) {
+
+                        statusCell.textContent = "🔴 Booked";
+
+                        statusCell.className = "slot-booked";
+
+                    } else {
+
+                        statusCell.textContent = "🟢 Available";
+
+                        statusCell.className = "slot-available";
+
+                        availableCount++;
+
+                        const option = document.createElement("option");
+
+                        option.value = time;
+
+                        option.textContent = formatTime(time);
+
+                        appointmentTime.appendChild(option);
+
+                    }
+
+
+                    row.appendChild(timeCell);
+
+                    row.appendChild(statusCell);
+
+                    availabilityBody.appendChild(row);
+
+                });
+
+
+                appointmentTime.disabled = availableCount === 0;
+
+                availabilityMessage.textContent =
+                    `${availableCount} of ${timeSlots.length} slots available.`;
+
+
+                if (availableCount === 0) {
+
+                    appointmentTime.innerHTML =
+                        '<option value="">No slots available</option>';
+
+                }
+
+            }
+
+            catch (error) {
+
+                resetAvailability(
+                    "Unable to load availability. Please try again."
+                );
+
+                console.error(error);
+
+            }
+
+        }
+
+
+        // UPDATE AVAILABILITY WHEN DOCTOR CHANGES
+        doctorSelect.addEventListener(
+            "change",
+            loadAvailability
+        );
+
+
+        // UPDATE AVAILABILITY WHEN DATE CHANGES
+        appointmentDate.addEventListener(
+            "change",
+            loadAvailability
+        );
+
+
+        // SHOW EMERGENCY WARNING
+        appointmentType.addEventListener("change", function () {
+
+            if (this.value === "Emergency") {
+
+                emergencyWarning.style.display = "block";
+
+            } else {
+
+                emergencyWarning.style.display = "none";
+
+            }
+
+        });
+
+
+        // PREVENT PAST DATES
+        const today = new Date();
+
+        const localToday =
+            today.getFullYear() + "-" +
+            String(today.getMonth() + 1).padStart(2, "0") + "-" +
+            String(today.getDate()).padStart(2, "0");
+
+        appointmentDate.min = localToday;
+
+
     </script>
 
 </body>

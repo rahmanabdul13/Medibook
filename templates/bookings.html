@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments | MediBook</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h2>🏥 MediBook</h2>
+
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/hospitals">Hospitals</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/book">Book Appointment</a>
+        </div>
+    </nav>
+
+    <section class="booking-section">
+        <div class="booking-container appointments-container">
+
+            <h1>My Appointments</h1>
+
+            <p class="booking-description">
+                Enter your registered email to view your appointments.
+            </p>
+
+            <form action="/my-appointments" method="POST">
+
+                <label>Email Address</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+                <button type="submit" class="booking-btn">
+                    Find My Appointments
+                </button>
+
+            </form>
+
+            {% if searched %}
+
+                <h2>Your Bookings</h2>
+
+                {% if appointments %}
+
+                    {% for appointment in appointments %}
+
+                        <div class="appointment-card">
+
+                            <h3>{{ appointment.hospital }}</h3>
+
+                            <p><strong>Patient:</strong>
+                                {{ appointment.patient_name }}</p>
+
+                            <p><strong>Doctor:</strong>
+                                {{ appointment.doctor }}</p>
+
+                            <p><strong>Date:</strong>
+                                {{ appointment.appointment_date }}</p>
+
+                            <p><strong>Time:</strong>
+                                {{ appointment.appointment_time }}</p>
+
+                            <p><strong>Status:</strong>
+                                {{ appointment.status }}</p>
+                                {% if appointment.status == "Pending" %}
+<form action="/cancel-appointment/{{ appointment.id }}" method="POST"
+      onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+
+    <button type="submit" class="cancel-btn">
+        Cancel Appointment
+    </button>
+
+</form>
+{% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p>No appointments found for this email.</p>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+    </section>
+
+    <footer>
+        <h3>🏥 MediBook</h3>
+        <p>Making healthcare appointments simpler.</p>
+    </footer>
+
+</body>
+</html>
